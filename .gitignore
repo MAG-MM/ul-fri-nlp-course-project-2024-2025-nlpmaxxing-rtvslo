@@ -131,6 +131,6 @@ dmypy.json
 
 .DS_Store
 
-data/**
-!data/raw/.gitkeep
+data/**/*.csv
+data/**/*.xlsx
 
