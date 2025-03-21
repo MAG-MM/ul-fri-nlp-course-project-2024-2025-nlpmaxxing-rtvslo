@@ -135,4 +135,6 @@ data/**/*.csv
 data/**/*.xlsx
 data/**/*.rtf
 data/**/*.zip
-
+data/**/*.docx
+data/**/*.md
+data/**/*.html
