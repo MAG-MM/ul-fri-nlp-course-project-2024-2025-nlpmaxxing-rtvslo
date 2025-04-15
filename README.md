@@ -14,7 +14,6 @@ Methodology
 
 5. Evaluation and Performance Analysis: Assess the effectiveness of each technique by measuring improvements in model performance, using appropriate automatic (P, R, F1) and human evaluation metrics.
 
-
 ### Data
 
 We will keep data out of version control.
@@ -22,11 +21,12 @@ We will keep data out of version control.
 The git-ignored contents will be available [here](https://unilj-my.sharepoint.com/:f:/g/personal/ms88481_student_uni-lj_si/Eg-AwdBXjatHhmnU9rrx2B0BQ0d61h3-_Jks1pwqtcrYBQ?e=6NGF0B) and everyone part of the UniLJ network can download them. They should be placed within it's corresponding data locations.
 
 ### Report
+
 The `/report` directory contains LaTeX source code and generated pdf for the assignment report.
 
 ### Code
-The `/src` directory contains source code for the project.
 
+The `/src` directory contains source code for the project.
 
 ### Local Environment
 
@@ -38,3 +38,7 @@ Source it:
 - Windows: `.venv\Scripts\activate`
 
 Install dependencies: `pip install -r requirements.txt`
+
+### Data preprocess
+
+To run preprocessing, run consolidate output, then extract datetime and then run extract metadata.
