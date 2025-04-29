@@ -41,4 +41,12 @@ Install dependencies: `pip install -r requirements.txt`
 
 ### Data preprocess
 
-To run preprocessing, run consolidate output, then extract datetime and then run extract metadata.
+To run preprocessing, run consolidate input, output, then merge inputs and outputs.
+
+### List of packages
+
+Install pytorch.
+
+pip install `jupyter polars fastexcel lxml tqdm striprtf scikit-learn`
+
+`pip install transformers datasets accelerate peft trl bitsandbytes protobuf`

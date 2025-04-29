@@ -138,3 +138,7 @@ data/**/*.zip
 data/**/*.docx
 data/**/*.md
 data/**/*.html
+data/hf/**
+
+models/**
+outputs/**
