@@ -50,3 +50,10 @@ Install pytorch.
 pip install `jupyter polars fastexcel lxml tqdm striprtf scikit-learn`
 
 `pip install transformers datasets accelerate peft trl bitsandbytes protobuf`
+
+### Slurm scripts:
+
+- `prepare.sh` will create a container and provision it with the required packages.
+- `train.sh` will add some env vars and run the `train.py` script from within a container.
+- `schedule-tran.sh` will simply create a queued job to run the `train.sh`
+- Your home directory should have: containers, logs, data and scripts subdirectories.
