@@ -3,7 +3,7 @@ from typing import Literal
 
 #device = 'cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu'
 
-model_path = "../models/nlpmaxxing-GaMS-2B-rtvslo-trfc-cluster"
+model_path = "../models/nlpmaxxing-rtvslo-trfc-cluster"
 
 input_tags = [
     "A1",

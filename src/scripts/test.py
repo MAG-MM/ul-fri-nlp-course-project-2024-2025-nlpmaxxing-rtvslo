@@ -4,12 +4,20 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 from tqdm import tqdm
 import polars as pl
 
-model = AutoModelForCausalLM.from_pretrained(model_path)
+
+base_model_id = "GaMS-2B" # 9B or 2B
+model_tag = "len512bs4"
+
+ft_model_path = f"{model_path}-{base_model_id}-{model_tag}"
+
+device = 'cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu'
+
+model = AutoModelForCausalLM.from_pretrained(ft_model_path)
 model.to(device)
 
-model.eval()
+#model.eval()
 
-tokenizer = AutoTokenizer.from_pretrained(model_path)
+tokenizer = AutoTokenizer.from_pretrained(ft_model_path)
 
 results = {
     "id": [],
@@ -44,5 +52,5 @@ for i in tqdm(test_ds.iter(batch_size=1), total=test_ds.num_rows):
 
 df = pl.from_dict(results)
 
-df.write_csv("../test-results.csv")
+df.write_csv(f"../test-results-{base_model_id}-{model_tag}.csv")
 

@@ -4,8 +4,10 @@ from transformers import BitsAndBytesConfig, AutoTokenizer, AutoModelForCausalLM
 from peft import LoraConfig
 from trl import SFTTrainer, SFTConfig
 
-#base_model_id = "cjvt/GaMS-9B"
-base_model_id = "cjvt/GaMS-2B"
+base_model_id = "GaMS-2B" # 9B or 2B
+base_model_path = f"cjvt/{base_model_id}"
+
+model_tag = "len512bs4"
 
 #device = 'cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu'
 
@@ -18,7 +20,7 @@ bnb_config = BitsAndBytesConfig(
 )
 
 model = AutoModelForCausalLM.from_pretrained(
-    base_model_id,
+    base_model_path,
     quantization_config=bnb_config,
     attn_implementation='eager',
     device_map="auto"
@@ -26,7 +28,7 @@ model = AutoModelForCausalLM.from_pretrained(
 
 #model.to(device) # for single gpu training
 
-tokenizer = AutoTokenizer.from_pretrained(base_model_id)
+tokenizer = AutoTokenizer.from_pretrained(base_model_path)
 
 # LoRA configuration
 peft_config = LoraConfig(
@@ -42,7 +44,7 @@ def formatting_prompts_func(example):
     return format_training_prompt(example)
 
 training_args = SFTConfig(
-    output_dir="../outputs/gemma-2b-finetune",
+    output_dir=f"../outputs/gams-{base_model_id}-finetune-{model_tag}",
     per_device_train_batch_size=4, # 4 with 512, 2 with 1024
     gradient_accumulation_steps=2,
     learning_rate=2e-4,
@@ -66,4 +68,4 @@ trainer = SFTTrainer(
 
 trainer.train()
 
-trainer.save_model(model_path)
+trainer.save_model(f"{model_path}-{base_model_id}-{model_tag}")
