@@ -7,7 +7,7 @@ from trl import SFTTrainer, SFTConfig
 base_model_id = "GaMS-9B" # 9B or 2B
 base_model_path = f"cjvt/{base_model_id}"
 
-model_tag = "len512bs2"
+model_tag = "len1024bs2"
 
 #device = 'cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu'
 
@@ -69,3 +69,8 @@ trainer = SFTTrainer(
 trainer.train()
 
 trainer.save_model(f"{model_path}-{base_model_id}-{model_tag}")
+
+
+
+# "len512bs4" took 2h and 30 mins
+# "len1024bs2" took 4h and 30 mins
