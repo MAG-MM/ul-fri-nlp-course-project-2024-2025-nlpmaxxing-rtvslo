@@ -4,10 +4,10 @@ from transformers import BitsAndBytesConfig, AutoTokenizer, AutoModelForCausalLM
 from peft import LoraConfig
 from trl import SFTTrainer, SFTConfig
 
-base_model_id = "GaMS-2B" # 9B or 2B
+base_model_id = "GaMS-9B" # 9B or 2B
 base_model_path = f"cjvt/{base_model_id}"
 
-model_tag = "len512bs4"
+model_tag = "len512bs2"
 
 #device = 'cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu'
 
@@ -16,17 +16,17 @@ model_tag = "len512bs4"
 bnb_config = BitsAndBytesConfig(
     load_in_8bit=True, #'DTensor' object has no attribute 'compress_statistics' in 4bit
     bnb_4bit_quant_type="nf4",
-    bnb_4bit_compute_dtype=torch.bfloat16
+    bnb_4bit_compute_dtype=torch.bfloat16, # torch.float16
+    #bnb_4bit_use_double_quant=True,
 )
 
 model = AutoModelForCausalLM.from_pretrained(
     base_model_path,
     quantization_config=bnb_config,
     attn_implementation='eager',
-    device_map="auto"
+    torch_dtype=torch.bfloat16,
+    #device_map=device
 )
-
-#model.to(device) # for single gpu training
 
 tokenizer = AutoTokenizer.from_pretrained(base_model_path)
 
@@ -45,7 +45,7 @@ def formatting_prompts_func(example):
 
 training_args = SFTConfig(
     output_dir=f"../outputs/gams-{base_model_id}-finetune-{model_tag}",
-    per_device_train_batch_size=4, # 4 with 512, 2 with 1024
+    per_device_train_batch_size=2, # 4 with 512, 2 with 1024
     gradient_accumulation_steps=2,
     learning_rate=2e-4,
     logging_steps=50,
