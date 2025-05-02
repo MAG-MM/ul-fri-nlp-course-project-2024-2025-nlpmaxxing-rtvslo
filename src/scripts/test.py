@@ -68,10 +68,7 @@ for i in tqdm(test_ds.iter(batch_size=1), total=test_ds.num_rows):
         skip_special_tokens=False
     )
 
-    del output
-    del inputs
-    del generated_tokens
-    del prompt
+    results["predicted"].append(output)
 
 df = pl.from_dict(results)
 
