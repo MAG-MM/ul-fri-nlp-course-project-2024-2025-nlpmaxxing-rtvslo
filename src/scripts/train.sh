@@ -22,6 +22,14 @@ export APPTAINERENV_CUDA_LAUNCH_BLOCKING=1
 # multi gpu
 #singularity exec --nv /d/hpc/home/ms88481/containers/container-marjan-cuda-torch.sif torchrun --standalone --nnodes=1 --nproc_per_node=2 --master_port=29500 --master_addr=127.0.0.1 train.py
 
+
+
+
+# If of two gpus, only one is healthy, use this to allow only the healthy one in the node
+export CUDA_VISIBLE_DEVICES="1"
+
+
+
 singularity exec --nv /d/hpc/home/ms88481/containers/container-marjan-cuda-torch.sif python train.py
 
 

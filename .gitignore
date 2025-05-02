@@ -144,3 +144,5 @@ models/**
 outputs/**
 
 **/logs/**
+
+**/test/*.csv
