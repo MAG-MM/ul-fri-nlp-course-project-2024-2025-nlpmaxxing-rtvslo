@@ -3,6 +3,7 @@ import openai
 from typing import Optional, Dict, List, Tuple
 import re
 import torch
+import numpy as np
 
 
 class TrafficReportEvaluator:
@@ -36,8 +37,8 @@ class TrafficReportEvaluator:
         lengths = []
         for i in range(len(generated)):
             lengths.append((len(generated[i].split()) - len(reference[i].split())) / max(len(reference[i].split()), 1))
-        avg_len = sum(lengths) / len(lengths)
-        return avg_len, lengths
+        average_absolute_difference = np.mean(np.abs(lengths))
+        return average_absolute_difference, lengths
 
 
 if __name__ == "__main__":
@@ -61,5 +62,8 @@ if __name__ == "__main__":
     # evaluator = TrafficReportEvaluator(model='bert-base-multilingual-cased')
     bertscore_results = evaluator.bert_scores(generated, references)
     length_res_avg, length_results = evaluator.length_diff(generated, references)
-    print(bertscore_results)
-    print(f"length diff: ", length_results)
+    # print(bertscore_results)
+    for key, value in bertscore_results.items():
+        print(f"{key}: ", value)
+    print("length diff abs avg: ", length_res_avg)
+    print("length diff: ", length_results)
