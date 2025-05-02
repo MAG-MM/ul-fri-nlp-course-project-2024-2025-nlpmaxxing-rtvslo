@@ -1,5 +1,8 @@
 from bert_score import BERTScorer
-from typing import List, Dict
+import openai
+from typing import Optional, Dict, List, Tuple
+import re
+import torch
 
 
 class TrafficReportEvaluator:
@@ -7,7 +10,7 @@ class TrafficReportEvaluator:
         self.lang = lang
         self.bertscore_model = model
 
-    def bert_scores(self, generated: List[str], references: List[str]) -> Dict[str, float]:
+    def bert_scores(self, generated: List[str], references: List[str]):
         """
         Compute BERTScore Precision, Recall, and F1 between two lists of texts.
         """
@@ -19,8 +22,11 @@ class TrafficReportEvaluator:
         precision, recall, f1 = scorer.score(generated, references)
         return {
             'bertscore_precision': precision,
+            'bertscore_precision_mean': precision.mean().item(),
             'bertscore_recall': recall,
-            'bertscore_f1': f1
+            'bertscore_recall_mean': recall.mean().item(),
+            'bertscore_f1': f1,
+            'bertscore_f1_mean': f1.mean().item()
         }
 
     def length_diff(self, generated: List[str], reference: List[str]) -> List[float]:
@@ -30,7 +36,8 @@ class TrafficReportEvaluator:
         lengths = []
         for i in range(len(generated)):
             lengths.append((len(generated[i].split()) - len(reference[i].split())) / max(len(reference[i].split()), 1))
-        return lengths
+        avg_len = sum(lengths) / len(lengths)
+        return avg_len, lengths
 
 
 if __name__ == "__main__":
@@ -53,6 +60,6 @@ if __name__ == "__main__":
     evaluator = TrafficReportEvaluator()
     # evaluator = TrafficReportEvaluator(model='bert-base-multilingual-cased')
     bertscore_results = evaluator.bert_scores(generated, references)
-    length_results = evaluator.length_diff(generated, references)
+    length_res_avg, length_results = evaluator.length_diff(generated, references)
     print(bertscore_results)
     print(f"length diff: ", length_results)
