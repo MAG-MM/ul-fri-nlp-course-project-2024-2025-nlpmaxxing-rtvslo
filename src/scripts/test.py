@@ -22,7 +22,7 @@ bnb_config = BitsAndBytesConfig(
 model = AutoModelForCausalLM.from_pretrained(
     ft_model_path,
     quantization_config=bnb_config,
-    attn_implementation="eager",
+    #attn_implementation="eager", # this causes slow inference, forgotten :)
     torch_dtype=torch.bfloat16,
     device_map="auto"
 )
@@ -34,6 +34,11 @@ model.eval()
 model.gradient_checkpointing_enable()
 
 tokenizer = AutoTokenizer.from_pretrained(ft_model_path)
+
+def save_all(res):
+    df = pl.from_dict(res)
+    df.write_csv(f"../test/test-results-{base_model_id}-{model_tag}.csv")
+    print("Test results saved.")
 
 results = {
     "id": [],
@@ -61,7 +66,10 @@ for i in tqdm(test_ds.iter(batch_size=1), total=test_ds.num_rows):
     input_size = inputs.input_ids.shape[1] - 2 # to include '## Traffic Report:', for v3
 
     with torch.no_grad():
-        generated_tokens = model.generate(inputs["input_ids"], max_new_tokens=256) # max_new_tokens=256
+        try:
+            generated_tokens = model.generate(inputs["input_ids"], max_new_tokens=256) # max_new_tokens=256
+        except:
+            save_all(results)
 
     output = tokenizer.decode(
         generated_tokens[0][input_size:],
@@ -70,7 +78,5 @@ for i in tqdm(test_ds.iter(batch_size=1), total=test_ds.num_rows):
 
     results["predicted"].append(output)
 
-df = pl.from_dict(results)
 
-df.write_csv(f"../test/test-results-{base_model_id}-{model_tag}.csv")
-
+save_all(results)
