@@ -11,10 +11,14 @@ import classla
 # classla.download('sl')
 
 
-def extract_named_entities(text: str, nlp, lemmatize=True) -> Set[str]:
+def extract_named_entities(text: str, nlp, lemmatize=True, extended=True) -> Set[str]:
     doc = nlp(text)
-    named_entities = set()
 
+    if extended:
+        named_entities = extract_named_entities_with_hyphen(text, doc)
+    else:
+        named_entities = set()
+    
     for sentence in doc.sentences:
         for entity in sentence.ents:
             if entity.type == 'LOC':
@@ -28,6 +32,24 @@ def extract_named_entities(text: str, nlp, lemmatize=True) -> Set[str]:
                     named_entities.add(ent_text)
 
     return named_entities
+
+
+def extract_named_entities_with_hyphen(text: str, doc) -> Set[str]:
+    original_tokens = text.lower().split()
+    named_entities = set()
+    named_entities_hyphen = set()
+
+    for sent in doc.sentences:
+        for ent in sent.ents:
+            named_entities.add(ent.text.lower())
+
+    for token in original_tokens:
+        if '-' in token:
+            parts = token.split('-')
+            if parts[0] in named_entities:
+                named_entities_hyphen.add(token)
+
+    return named_entities_hyphen
 
 
 class TrafficReportEvaluator:
@@ -65,7 +87,7 @@ class TrafficReportEvaluator:
         return average_absolute_difference, lengths
 
     def named_entity_evaluation(self, generated: List[str], reference: List[str],
-                                lang='sl', lemmatize=True):
+                                lang='sl', lemmatize=True, extended=True):
         """
         precision: the share of intersecting named entities in generated named entities
         recall: the share of intersecting named entities in reference named entities
@@ -80,15 +102,14 @@ class TrafficReportEvaluator:
         recall = []
         f1 = []
         for i in range(len(generated)):
-            ne_g = extract_named_entities(generated[i], nlp, lemmatize=lemmatize)
-            ne_r = extract_named_entities(reference[i], nlp, lemmatize=lemmatize)
+            ne_g = extract_named_entities(generated[i], nlp, lemmatize=lemmatize, extended=extended)
+            ne_r = extract_named_entities(reference[i], nlp, lemmatize=lemmatize, extended=extended)
             true_positives = ne_g & ne_r
 
             precision.append(len(true_positives) / len(ne_g) if ne_g else 1.0 if not ne_r else 0.0)
             recall.append(len(true_positives) / len(ne_r) if ne_r else 1.0 if not ne_g else 0.0)
             f1.append(2 * precision[-1] * recall[-1] / (precision[-1] + recall[-1])
                       if (precision[-1] + recall[-1]) else 0.0)
-            a = 1
 
         return {
             "precision": precision,
