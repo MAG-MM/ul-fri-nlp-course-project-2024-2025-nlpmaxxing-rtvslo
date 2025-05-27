@@ -6,24 +6,26 @@ import numpy as np
 import classla
 
 
-classla.download("sl")
+# uncomment to download the Slovenian model
+# commented so that it does not run on import
+# classla.download('sl')
 
 
-def extract_named_entities(text: str, lang='sl') -> Set[str]:
-    nlp = classla.Pipeline(lang=lang, processors='tokenize,ner', verbose=False)
+def extract_named_entities(text: str, nlp, lemmatize=True) -> Set[str]:
     doc = nlp(text)
     named_entities = set()
 
-    for sent in doc.sentences:
-        for ent in sent.ents:
-            ent_text = ent.text.lower().strip()
-            # ent_type = ent.type  # e.g., LOC, PER, ORG
-
-            named_entities.add(ent_text)
-
-            # if ent_type not in entity_dict:
-            #     entity_dict[ent_type] = set()
-            # entity_dict[ent_type].add(ent_text)
+    for sentence in doc.sentences:
+        for entity in sentence.ents:
+            if entity.type == 'LOC':
+                if lemmatize:
+                    # Lemmatize each token in the entity
+                    lemmas = [word.words[0].lemma.lower() for word in entity.tokens]
+                    lemmatized_entities = " ".join(lemmas).strip()
+                    named_entities.add(lemmatized_entities)
+                else:
+                    ent_text = entity.text.lower().strip()
+                    named_entities.add(ent_text)
 
     return named_entities
 
@@ -62,19 +64,31 @@ class TrafficReportEvaluator:
         average_absolute_difference = np.mean(np.abs(lengths))
         return average_absolute_difference, lengths
 
-    def named_entity_evaluation(self, generated: List[str], reference: List[str]):
+    def named_entity_evaluation(self, generated: List[str], reference: List[str],
+                                lang='sl', lemmatize=True):
+        """
+        precision: the share of intersecting named entities in generated named entities
+        recall: the share of intersecting named entities in reference named entities
+        f1: combination of precision and recall
+        """
+        if lemmatize:
+            nlp = classla.Pipeline(lang=lang, processors='tokenize,ner,pos,lemma', verbose=False)
+        else:
+            nlp = classla.Pipeline(lang=lang, processors='tokenize,ner', verbose=False)
+
         precision = []
         recall = []
         f1 = []
         for i in range(len(generated)):
-            ne_g = extract_named_entities(generated[i])
-            ne_r = extract_named_entities(reference[i])
+            ne_g = extract_named_entities(generated[i], nlp, lemmatize=lemmatize)
+            ne_r = extract_named_entities(reference[i], nlp, lemmatize=lemmatize)
             true_positives = ne_g & ne_r
 
             precision.append(len(true_positives) / len(ne_g) if ne_g else 1.0 if not ne_r else 0.0)
             recall.append(len(true_positives) / len(ne_r) if ne_r else 1.0 if not ne_g else 0.0)
             f1.append(2 * precision[-1] * recall[-1] / (precision[-1] + recall[-1])
                       if (precision[-1] + recall[-1]) else 0.0)
+            a = 1
 
         return {
             "precision": precision,
