@@ -11,8 +11,12 @@ import classla
 # classla.download('sl')
 
 
-def extract_named_entities(text: str, nlp, lemmatize=True, extended=True) -> Set[str]:
-    doc = nlp(text)
+def extract_named_entities(text: str, nlp, lemmatize=True, extended=True) -> Set[str] | None:
+    try:
+        doc = nlp(text)
+    except IndexError:
+        print("error")
+        return None
 
     if extended:
         named_entities = extract_named_entities_with_hyphen(text, doc)
@@ -104,6 +108,13 @@ class TrafficReportEvaluator:
         for i in range(len(generated)):
             ne_g = extract_named_entities(generated[i], nlp, lemmatize=lemmatize, extended=extended)
             ne_r = extract_named_entities(reference[i], nlp, lemmatize=lemmatize, extended=extended)
+
+            if not ne_r or not ne_g:
+                precision.append("error")
+                recall.append("error")
+                f1.append("error")
+                continue
+
             true_positives = ne_g & ne_r
 
             precision.append(len(true_positives) / len(ne_g) if ne_g else 1.0 if not ne_r else 0.0)
