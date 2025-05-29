@@ -3,16 +3,14 @@ from common import model_path, generate_special_tokens
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from peft import PeftModel
 
-base_model_id = "GaMS-2B" # 9B or 2B
+base_model_id = "GaMS-9B-Instruct" # 9B or 2B
 base_model_path = f"cjvt/{base_model_id}"
 
-model_tag = "len1024bs4-v3"
-
-#https://www.datacamp.com/tutorial/fine-tuning-gemma-2
+model_tag = "v5-2048"
 
 
 tokenizer = AutoTokenizer.from_pretrained(base_model_path)
-tokenizer.add_tokens(generate_special_tokens(), special_tokens=True)
+#tokenizer.add_tokens(generate_special_tokens(), special_tokens=True)
 tokenizer.save_pretrained(f"{model_path}-{base_model_id}-{model_tag}-MERGED")
 
 base_model = AutoModelForCausalLM.from_pretrained(
@@ -22,7 +20,11 @@ base_model = AutoModelForCausalLM.from_pretrained(
     device_map="auto"
 )
 
-base_model.resize_token_embeddings(len(tokenizer))
+# when warnings, this should be for training as well
+base_model.generation_config.temperature=None
+base_model.generation_config.top_p=None
+
+#base_model.resize_token_embeddings(len(tokenizer))
 
 peft_model = PeftModel.from_pretrained(
     base_model,
