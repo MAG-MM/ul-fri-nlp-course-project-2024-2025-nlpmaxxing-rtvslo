@@ -142,6 +142,7 @@ data/**/*.docx
 data/**/*.md
 data/**/*.html
 data/hf/**
+data/hf-split/**
 
 models/**
 outputs/**

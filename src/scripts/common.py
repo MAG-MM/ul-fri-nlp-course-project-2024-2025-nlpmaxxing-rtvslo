@@ -54,12 +54,12 @@ Generate a traffic report from the following input data.
 """
 
 def format_single_input(input_item, i):
-    input_string = f"\n### Input_{i+1}:\n"
+    input_string = f"### Input_{i+1}:\n"
     for tag in input_tags:
         if input_item[tag] != None:
-            input_string = input_string + f"\n#### {tag}:\n{input_item[tag]}\n"
+            input_string = input_string + f"#### {tag}:\n{input_item[tag]}\n"
 
-    return input_string.strip()
+    return input_string.strip() + "\n\n"
 
 def format_sample(example):
     inputs = ""
@@ -77,6 +77,35 @@ def format_sample(example):
         "target": content
     }
 
+
+
+def format_gemma_chat_input(input_data):
+    return f"""
+Generate a traffic report from the following input data.
+
+## Inputs:
+
+{input_data['input']}
+"""
+
+def format_gemma_chat_output(input_data):
+    return f"""
+## Traffic Report:
+
+{input_data['target']}
+"""
+
+def convert_to_gemma_chat(sample):
+    return [
+        {"role": "user", "content": format_gemma_chat_input(sample)},
+        {"role": "model", "content": format_gemma_chat_output(sample)}
+    ]
+
+def convert_to_gemma_chat_inference(sample):
+    return [
+        {"role": "user", "content": format_gemma_chat_input(sample)},
+    ]
+
 def prepare_dataset(name: Literal['tiny', 'test', 'test-mini', 'train'], rm_columns = ["inputs", "output"]):
     dataset = Dataset.load_from_disk(f"../data/hf/dataset-{name}")
     return dataset.map(format_sample, remove_columns=rm_columns)
@@ -90,3 +119,5 @@ def generate_special_tokens():
         tokens.append(f"### Input_{i+1}:")
 
     return tokens
+
+
