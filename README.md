@@ -30,18 +30,20 @@ The `/src` directory contains source code for the project.
 
 Notebooks:
 
-- `data-consolidate-input`
-- `data-consolidate-output`
-- `data-inspect`
-- `data-merge-inputs-outputs`
-- `data-split-testset`
-- `data-hf`
-- `data-hf-single-in-out`
+- `data-consolidate-input`: consolidates all inputs from the excel file into csv, strips html tags, parses timestamp and prepares the data for further processing.
+- `data-consolidate-output`: parses all output files and consolidates them into csv. Also parses date and time for further processing.
+- `data-inspect`: Inspect the input and output csv files
+- `data-merge-inputs-outputs`: Matches multiple inputs to one output with a time threshold of 3 minutes before the air time of the output. It also splits the dataset on train and test with 80:20 ratio.
+- `data-split-testset`: further splits the test into a mini test for faster evaluation.
+- `data-hf`: adapts the data for fine tunning and converts it into a HuggingFace Dataset format
+- `data-hf-single-in-out`: adapts the data for fine tunning and converts it into a HuggingFace Dataset format - for batched training where a sequence is one input and one output.
 
 Scripts:
 
 - `scripts`: Python scripts for running locally and in the HPC cluster with the data with all inputs combined to form an output
 - `scripts_split`: Python scripts for running locally and in the HPC cluster with the data chunked input by input to form an output to achieve fine-tunning without going over the maximum possible token count limit. This should be consider the final code for fine-tunning and running inference on a test set.
+
+After a local environment is set up and the gitignored files are downloaded, run the `test_s.py` file inside the `scripts_split` directory. There is a sample command at the bottom of the file.
 
 ### Local Environment
 
@@ -52,7 +54,11 @@ Source it:
 - For Mac or Linux, run: `source .venv/bin/activate`
 - Windows: `.venv\Scripts\activate`
 
-Install dependencies: `pip install -r requirements.txt`
+Install dependencies: `pip install -r requirements.txt` - may be outdated
+
+### Dependencies (up to date 30.05.2025):
+
+`pip install transformers datasets accelerate peft trl bitsandbytes protobuf blobfile sentencepiece polars`
 
 ### Data preprocess
 
