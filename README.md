@@ -28,6 +28,21 @@ The `/report` directory contains LaTeX source code and generated pdf for the ass
 
 The `/src` directory contains source code for the project.
 
+Notebooks:
+
+- `data-consolidate-input`
+- `data-consolidate-output`
+- `data-inspect`
+- `data-merge-inputs-outputs`
+- `data-split-testset`
+- `data-hf`
+- `data-hf-single-in-out`
+
+Scripts:
+
+- `scripts`: Python scripts for running locally and in the HPC cluster with the data with all inputs combined to form an output
+- `scripts_split`: Python scripts for running locally and in the HPC cluster with the data chunked input by input to form an output to achieve fine-tunning without going over the maximum possible token count limit. This should be consider the final code for fine-tunning and running inference on a test set.
+
 ### Local Environment
 
 Create a virtual environment: `python -m venv .venv`
