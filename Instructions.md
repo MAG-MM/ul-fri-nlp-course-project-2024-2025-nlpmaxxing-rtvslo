@@ -27,7 +27,7 @@ Install dependencies: `pip install -r requirements.txt`
 
 - Training and inference: `pip install transformers datasets accelerate peft trl bitsandbytes protobuf blobfile sentencepiece polars`
 
-- Results Evaluation: **classla** downgrades some packages to uncompatible versions. To resolve this which is only needed for evaluation, we can create a new virtual environment and use it for `evaluate_results`.
+- Results Evaluation: **classla** downgrades some packages to uncompatible versions. To resolve this which is only needed for evaluation, we can create a new virtual environment and use it for `evaluate_results` or use torch 2.6.0.
 
 `pip install bert_score sentence_transformers seaborn classla openai dotenv`
 
