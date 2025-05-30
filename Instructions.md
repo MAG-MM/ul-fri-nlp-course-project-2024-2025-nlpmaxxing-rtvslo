@@ -15,7 +15,7 @@ Create a virtual environment: `python -m venv .venv`
 Source it:
 
 - For Mac or Linux, run: `source .venv/bin/activate`
-- Windows: `.venv\Scripts\activate`
+- Windows: `source .venv\Scripts\activate`
 
 Install dependencies: `pip install -r requirements.txt`
 
@@ -27,7 +27,9 @@ Install dependencies: `pip install -r requirements.txt`
 
 - Training and inference: `pip install transformers datasets accelerate peft trl bitsandbytes protobuf blobfile sentencepiece polars`
 
-- Evaluation: `pip install bert_score sentence_transformers seaborn classla`
+- Results Evaluation: **classla** downgrades some packages to uncompatible versions. To resolve this which is only needed for evaluation, we can create a new virtual environment and use it for `evaluate_results`.
+
+`pip install bert_score sentence_transformers seaborn classla openai dotenv`
 
 ### Running locally - preparations
 
