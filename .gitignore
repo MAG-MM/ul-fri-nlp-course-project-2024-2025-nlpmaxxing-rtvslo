@@ -145,8 +145,11 @@ data/hf/**
 data/hf-split/**
 
 models/**
+!models/.gitkeep
 outputs/**
+!outputs/.gitkeep
 
 **/logs/**
 
 **/test/*.csv
+!test/.gitkeep
