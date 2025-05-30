@@ -1,9 +1,12 @@
 from bert_score import BERTScorer
-from typing import Dict, List, Set
+from typing import List, Set
 import numpy as np
 import classla
 from sentence_transformers import SentenceTransformer
 from sentence_transformers.util import cos_sim
+from openai import OpenAI
+from dotenv import load_dotenv
+import os
 
 
 # uncomment to download the Slovenian model
@@ -79,6 +82,53 @@ def labse_similarity(model, text_1: str, text_2: str) -> float:
     embedding_2 = model.encode(text_2, convert_to_tensor=True)
     similarity = cos_sim(embedding_1, embedding_2)
     return similarity.item()
+
+
+def gpt_compare_reports(reference_report: str, generated_report: str):
+    load_dotenv()
+    client = OpenAI(
+        api_key=os.getenv("OPENAI_API_KEY")
+    )
+    system_message = (
+        "You are a traffic report evaluator. "
+        "Given a reference report and a generated report in Slovenian language, "
+        "respond with two integers only: first a semantic similarity score (0-3), "
+        "then a readability score (0-3). "
+        "No explanation, just the two numbers separated by a comma. "
+        "Semantic similarity of 3 is the best, meaning full similarity, including location names, while 0 means no or minimal similarity. "
+        "Readability score of 3 is the best, meaning well readable and understandable for humans without any spelling or grammatical mistakes, "
+        "while score of 0 means some unreadable nonsense."
+    )
+    user_message = f"Reference report:\n{reference_report}\n\nGenerated report:\n{generated_report}"
+    
+    response = client.responses.create(
+        model="gpt-4",
+        input=[
+            {
+                "role": "system",
+                "content": [
+                    {
+                        "type": "input_text",
+                        "text": system_message,
+                    }
+                ]
+            },
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "input_text",
+                        "text": user_message,
+                    }
+                ]
+            }
+        ],
+        temperature=0.0,
+    )
+    
+    result = response.output_text
+    similarity, readability = map(int, result.strip().split(","))
+    return similarity, readability
 
 
 class TrafficReportEvaluator:
@@ -202,6 +252,16 @@ class TrafficReportEvaluator:
             "recall": recall,
             "f1": f1,
         }
+        
+    def chagpt_evaluation(self, generated: List[str], reference: List[str]):
+        scores_semantic_similarity = []
+        scores_readibility = []
+        for i in range(len(generated)):
+            sem, read = gpt_compare_reports(generated_report=generated[i], 
+                                            reference_report=reference[i])
+            scores_semantic_similarity.append(sem)
+            scores_readibility.append(read)
+        return scores_semantic_similarity, scores_readibility
 
 
 if __name__ == "__main__":

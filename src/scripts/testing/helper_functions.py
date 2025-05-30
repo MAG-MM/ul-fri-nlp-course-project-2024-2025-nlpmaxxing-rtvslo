@@ -16,22 +16,30 @@ def find_n_reports(df: pd.DataFrame, column_name: str, n=1, sort="desc", abs=Fal
     else:
         raise ValueError("sort must be either 'desc' or 'asc'")
 
-# TODO
 
-def find_and_print_n_reports(df: pd.DataFrame, column_name: str, n=1, sort="desc", abs=False):
+def find_reports_based_on_criteria(df: pd.DataFrame, thresholds: dict[str, float], n=1):
     """
-    Finds and prints the n reports based on the specified column and other criteria.
+    Returns the indices of the n rows where all specified columns are >= their threshold values.
     """
-    row_indices = find_n_reports(df, column_name, n=n, sort=sort, abs=abs)
-    print(f"metric: {column_name}, n: {n}")
-    for index in row_indices:
+    mask = pd.Series([True] * len(df), index=df.index)
+    for col, threshold in thresholds.items():
+        mask &= df[col] >= threshold
+    filtered = df[mask]
+    return filtered.index[:n].tolist()
+
+
+def print_reports(df: pd.DataFrame, indices: list[int], metric: str):
+    """
+    Prints the n reports.
+    """
+    print(f"metric: {metric}, n: {len(indices)}")
+    for index in indices:
         print("---------------------------------------------------------")
-        print(f"Score: {df.iloc[index][column_name]}, Index: {index}")
+        print(f"Score: {df.iloc[index][metric]}, Index: {index}")
         print(f"{df.iloc[index]["predicted"]}")
         print("--------")
         print(f"{df.iloc[index]["target"]}")
         print("\n\n")
-    return row_indices
 
 
 def column_average_score(df, column_name):
@@ -50,7 +58,7 @@ def column_median_score(df, column_name):
 
 def plot_column_distribution(df: pd.DataFrame, column_name: str, bins=10):
     if pd.api.types.is_numeric_dtype(df[column_name]):
-        plt.figure(figsize=(10, 6))
+        plt.figure(figsize=(6, 4))
         plt.hist(df[column_name], bins=bins, edgecolor='black', alpha=0.7)
         plt.title(f'Distribution of {column_name}')
         plt.xlabel(column_name)
