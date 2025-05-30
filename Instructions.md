@@ -103,7 +103,7 @@ You can adapt this script for a single example or use the `scripts/demo.ipynb` n
 
 This depends on the test file generated with inference and the precalculated scores, available within the `outputs` directory in the **Resources Shared Directory**.
 
-- `evaluate_results`: the notebook for evaluating generated reports with evaluation metrics. Loads the csv file with generated and reference reports, calulates different metrics, draws some graphs for easier undertanding and then finds a few best reports based on chosen selection metrics.
+- `evaluate_results`: the notebook for evaluating generated reports with evaluation metrics. Loads the csv file with generated and reference reports, calulates different metrics, draws some graphs for easier undertanding and then finds a few best reports based on chosen selection metrics. For GPT evaluation you need OpenAI API key and credits. For that create a .env file with `OPENAI_API_KEY=...`. If you don't want to use this metric for evaluation, simply comment out the line for GPT evaluation.
 - `view_results`: similar to `evaluate_results`, but it immediately loads the csv file with reports and coresponding metrics instead of calculating them. The file is available [here](https://unilj-my.sharepoint.com/:x:/g/personal/ms88481_student_uni-lj_si/EaC0oJgOflBHvQ41gMT-AC4Bg7Tz9u-XBi8CF6Ek1KlvjQ?e=QTeJM5). **Use this to check our results.**
 
 Other evaluation code:
