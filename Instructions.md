@@ -21,7 +21,7 @@ Install dependencies: `pip install -r requirements.txt`
 
 ### Dependencies (up to date 30.05.2025):
 
-- Install pytorch with CUDA support if you have a GPU access.
+- Install pytorch with CUDA support if you have a GPU access. Version 2.6.0 is required for evaluating results.
 
 - General: `pip install jupyter polars fastexcel lxml tqdm striprtf scikit-learn`
 
