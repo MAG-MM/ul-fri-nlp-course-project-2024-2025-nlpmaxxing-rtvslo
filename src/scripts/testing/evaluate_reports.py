@@ -11,7 +11,7 @@ import os
 
 # uncomment to download the Slovenian model
 # commented so that it does not run on import
-# classla.download('sl')
+classla.download('sl')
 
 
 def extract_named_entities(text: str, nlp, lemmatize=True, extended=True) -> Set[str] | None:
